@@ -14,6 +14,9 @@ public class Dao {
     }
 
     public void showLines() {
+        for (int i=0; i<=999; i++){
+
+        }
         System.out.println("-------");
     }
 

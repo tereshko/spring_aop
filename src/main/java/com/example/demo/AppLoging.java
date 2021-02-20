@@ -1,7 +1,9 @@
 package com.example.demo;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -22,13 +24,23 @@ public class AppLoging {
     public void beforeAnyMethod(JoinPoint joinPoint) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         methods.add(methodSignature.toString());
-    }
 
-    @After("execution(public void com.example.demo.Dao.*())")
-    public void afterAnyMethod() {
         Set<String> set = new HashSet<String>(methods);
         for (String s: set) {
             System.out.println(s + ": " + Collections.frequency(methods, s));
         }
+    }
+
+
+    @Around("execution(public void com.example.demo.*.*(..))")
+    public Object methodProfiling(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        System.out.println("start profiling");
+        long begin = System.currentTimeMillis();
+        Object out = proceedingJoinPoint.proceed();
+        long end = System.currentTimeMillis();
+        long duration = end - begin;
+        System.out.println((MethodSignature) proceedingJoinPoint.getSignature() + " duration: " + duration);
+        System.out.println("end profiling");
+        return out;
     }
 }
